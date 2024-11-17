@@ -4,6 +4,8 @@ import { search as zhSearch } from "./zh";
 export const shared = defineConfig({
   title: "GMObjC",
 
+  base: "/gmdocs/",
+
   rewrites: {
     "en/:rest*": ":rest*",
   },
