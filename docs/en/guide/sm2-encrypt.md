@@ -1,5 +1,7 @@
 # SM2 encryption and decryption {#sm2-encrypt-decrypt}
 
+SM2 is China's asymmetric algorithm standard based on elliptic curve cryptography. It supports encryption, digital signatures and key exchange. It has high security and computational efficiency and is widely used in the fields of electronic authentication and secure communications.
+
 ## Generate key pair {#sm2-generate-key}
 
 ```objc
@@ -17,7 +19,6 @@ SM2 encryption passes in the **plaintext** and **public key** to be encrypted. T
 
 ::: info Note
 1. The public key must be in HEX encoded string format and must be an uncompressed public key starting with **04**.
-
 2. If it is a compressed public key starting with **02** or **03**, use `decompressPublicKey:` to decompress it.
 3. The encryption result is in ASN1 format, which can be decoded into **C1C3C2** format using `asn1DecodeToC1C3C2Hex:`.
 :::
@@ -37,6 +38,7 @@ NSData *asn1Data = [GMSm2Utils encryptData:plainData publicKey:pubKey];
 NSString *c1c3c2Hex = [GMSm2Utils asn1DecodeToC1C3C2Hex:asn1Hex hasPrefix:NO];
 // ASN1 decoded to C1C3C2 format (data block type)
 NSData *c1c3c2Data = [GMSm2Utils asn1DecodeToC1C3C2Data:asn1Data hasPrefix:NO];
+
 // Ciphertext order C1C3C2 and C1C2C3 can be converted to each other
 NSString *c1c2c3Hex = [GMSm2Utils convertC1C3C2HexToC1C2C3:c1c3c2Hex hasPrefix:NO];
 // Conversion result c1c3c2HexResult is the same as c1c3c2Hex

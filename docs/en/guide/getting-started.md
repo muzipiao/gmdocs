@@ -74,13 +74,13 @@ After successful compilation, open Carthage to view the generated file directory
 
 ### Swift Package Manager {#install-spm}
 
-GMObjC supports SPM since 3.3.0. To use it in a project, click `File` -> `Swift Packages` -> `Add Package Dependency`, enter [GMObjC branch URL](https://github.com/muzipiao/GMObjC.git), or add a GitHub account in Xcode and search for `GMObjC`.
+GMObjC supports SPM since 3.3.0. To use it in a project, click `File` -> `Swift Packages` -> `Add Package Dependency`, URL  `https://github.com/muzipiao/GMObjC.git`, or add a GitHub account in Xcode and search for `GMObjC`.
 
 If used in a component library, update the `Package.swift` file:
 
 ```swift
 dependencies: [
-.package(url: "https://github.com/muzipiao/GMObjC.git", from: "4.0.0")
+    .package(url: "https://github.com/muzipiao/GMObjC.git", from: "4.0.0")
 ],
 ```
 
@@ -99,9 +99,9 @@ Use the `xcodebuild -create-xcframework` command to merge into XCFramework, and 
 xcodebuild -create-xcframework -framework Release-iphoneos/GMObjC.framework -framework Release-iphonesimulator/GMObjC.framework -output GMObjC.xcframework
 # Or wrap to display more clearly
 xcodebuild -create-xcframework \
--framework Release-iphoneos/GMObjC.framework \
--framework Release-iphonesimulator/GMObjC.framework \
--output GMObjC.xcframework
+           -framework Release-iphoneos/GMObjC.framework \
+           -framework Release-iphonesimulator/GMObjC.framework \
+           -output GMObjC.xcframework
 ```
 
 ### Direct integration {#install-source}

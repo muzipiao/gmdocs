@@ -3,9 +3,7 @@
 ECDH (Elliptic Curve Diffie-Hellman) is a key exchange protocol based on elliptic curves that allows two parties to securely share a common key over an insecure channel. The basic process is as follows:
 
 1. **Public key generation**: Both parties generate a pair of elliptic curve key pairs (private key, public key) and exchange public keys.
-
 2. **Shared key calculation**: Each party uses the other party's public key and its own private key to generate the same shared key through elliptic curve operations.
-
 3. **Result**: Both parties obtain the same shared key, which can be used for symmetric encryption communication.
 
 The security of ECDH depends on the elliptic curve discrete logarithm problem. `ECDH_compute_key()` in OpenSSL performs elliptic curve Diffie-Hellman key negotiation, which can negotiate an identical key when both parties are transmitting in plain text.
@@ -37,8 +35,8 @@ NSString *serverECDH = [GMSm2Utils computeECDH:clientPubKey privateKey:serverPri
 
 // In the case of all plaintext transmission, the client and server negotiated equal symmetric keys, and clientECDH==serverECDH holds
 if ([clientECDH isEqualToString:serverECDH]) {
-NSLog(@"ECDH key negotiation succeeded, the negotiated symmetric key is:\n%@", clientECDH);
+    NSLog(@"ECDH key negotiation succeeded, the negotiated symmetric key is:\n%@", clientECDH);
 }else{
-NSLog(@"ECDH key negotiation failed");
+    NSLog(@"ECDH key negotiation failed");
 }
 ```

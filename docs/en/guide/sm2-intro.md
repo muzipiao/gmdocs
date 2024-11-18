@@ -1,6 +1,6 @@
 # SM2 Algorithm Principle {#sm2-intro}
 
-SM2 algorithm is an asymmetric algorithm standard of the national secret standard, based on the extension of ecc (Elliptic Curves Cryptography). When it comes to asymmetric encryption, RSA comes to mind. The difficulty of factoring extremely large integers determines the reliability of the RSA algorithm ([RSA Algorithm Understanding](https://muzipiao.github.io/2016/12/iOS-%E7%AB%AF-RSA-%E5%8A%A0%E5%AF%86/)), which is the basis of RSA security. So what is the algorithm basis of national secret encryption and decryption? First, let's understand the elliptic curve.
+SM2 algorithm is an asymmetric algorithm standard of the chinese cryptography standard, based on the extension of ecc (Elliptic Curves Cryptography). When it comes to asymmetric encryption, RSA comes to mind. The difficulty of factoring extremely large integers determines the reliability of the RSA algorithm ([RSA Algorithm Understanding](https://muzipiao.github.io/2016/12/iOS-%E7%AB%AF-RSA-%E5%8A%A0%E5%AF%86/)), which is the basis of RSA security. So what is the algorithm basis of chinese cryptography encryption and decryption? First, let's understand the elliptic curve.
 
 ## SM2 Elliptic Curve {#sm2-curves-graph}
 
@@ -36,17 +36,17 @@ The above geometric reasoning is for easy understanding. The actual values ​�
 
 ![Recommended curve](/img/gmobjc-sm2-intro4.png)
 
-p: The set of points of the elliptic curve on the finite field Fp of prime number p;
+- p: The set of points of the elliptic curve on the finite field Fp of prime number p;
 
-a: The value of the elliptic curve parameter a;
+- a: The value of the elliptic curve parameter a;
 
-b: The value of the elliptic curve parameter b;
+- b: The value of the elliptic curve parameter b;
 
-n: The value range, the value range of the random integer d $[1,n-2]$;
+- n: The value range, the value range of the random integer d $[1,n-2]$;
 
-Gx: The x coordinate value of the base point, similar to the x coordinate value of point P;
+- Gx: The x coordinate value of the base point, similar to the x coordinate value of point P;
 
-Gy: The y coordinate value of the base point, similar to the y coordinate value of point P.
+- Gy: The y coordinate value of the base point, similar to the y coordinate value of point P.
 
 ## SM2 encryption {#sm2-encrypt-steps}
 
@@ -59,18 +59,16 @@ The length of the SM2 encryption result is fixed. For example, if the password i
 Let the elliptic curve be the recommended curve, the public key Q, the original text bit string M, and klen be the bit length of M;
 
 1. Calculate the random elliptic curve point $C1 = [k]G=(x1, y1)$, k is a random number, G is the base point, and the calculated multiple point C1 is 64 bytes;
-
 2. Verify the public key Q, calculate the elliptic curve point $S=[h]Q$, h is the cofactor, if S is an infinite point, exit;
-
 3. Calculate the elliptic curve point $[k]PB=(x2, y2)$, and obtain x2, y2;
-
 4. Calculate $t = KDF(x2||y2, klen)$, if t is a full 0 bit string, return to step 1, KDF is the key derivation function of SM2;
-
 5. Calculate $C2= M⊕t$, encrypt the plaintext, C2 is the real ciphertext, the length is the same as the original text;
 6. Calculate $C3= Hash (x2||M||y2)$, generate a hash value, used to verify the data, the length is 32 bytes;
 7. Output the ciphertext $C=C1||C3||C2$, C is the ciphertext result.
 
-Note: The OpenSSL encryption result is formatted and encoded in ASN1, and the length of the encryption result will not be fixed. Random numbers are used in the process, so the encryption result is different each time.
+::: info Note
+The OpenSSL encryption result is formatted and encoded in ASN1, and the length of the encryption result will not be fixed. Random numbers are used in the process, so the encryption result is different each time.
+:::
 
 ## SM2 decryption {#sm2-decrypt-steps}
 

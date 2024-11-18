@@ -6,7 +6,7 @@ GMObjC depends on **OpenSSL 1.1.1l** or above. When OpenSSL has been integrated 
 
 Use Carthage to compile GMObjC into a dynamic library **GMObjC.xcframework**. At this time, GMObjC will use the OpenSSL inside the dynamic library, while the project still uses the original OpenSSL, without affecting each other.
 
-1. **Solution 1**: According to the instructions in [Quick Start](./getting-started#install-carthage), compile GMObjC.xcframework and drag it to the project for integration.
+1. **Solution 1**: According to the instructions in [Getting Started](./getting-started#install-carthage), compile GMObjC.xcframework and drag it to the project for integration.
 
 2. **Solution 2**: Download the compiled [GMObjC.xcframework.zip
 ](https://github.com/muzipiao/GMObjC/releases) directly, unzip it and drag it to the project for integration.

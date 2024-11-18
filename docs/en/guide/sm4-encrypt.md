@@ -2,7 +2,7 @@
 
 SM4 symmetric encryption is relatively simple. For encryption, pass in **plaintext** and **key**, and for decryption, pass in **ciphertext** and **key**. GMSm4Utils is an Objective-C implementation of the SM4 block cipher algorithm, supporting both ECB and CBC encryption modes.
 
-::: info Feature introduction
+::: info Features
 - ECB electronic codebook mode, ciphertext is divided into blocks of equal length (filled if insufficient), and encrypted block by block.
 - CBC ciphertext block chaining mode, the ciphertext of the previous block and the plaintext of the current block are XORed and then encrypted.
 - Padding method: SM4 encryption requires 16-bit alignment, using PKCS7Padding for padding.

@@ -57,7 +57,7 @@ NSString *privateDerPath = [tmpDir stringByAppendingPathComponent:@"t-private.de
 
 // Write public and private keys to PEM/DER files, return YES if writing is successful, otherwise return NO
 BOOL success1 = [GMSm2Bio savePublicKey:pubKey toPemFileAtPath:publicPemPath];
-BOOL success2 = [GMSm2Bio savePublicKey:pubKey toPemFileAtPath:publicPemPath]; toDerFileAtPath:publicDerPath];
+BOOL success2 = [GMSm2Bio savePublicKey:pubKey toDerFileAtPath:publicDerPath];
 BOOL success3 = [GMSm2Bio savePrivateKey:priKey toPemFileAtPath:privatePemPath];
 BOOL success4 = [GMSm2Bio savePrivateKey:priKey toDerFileAtPath:privateDerPath];
 ```

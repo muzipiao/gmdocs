@@ -74,7 +74,7 @@ carthage update --use-xcframeworks
 
 ### Swift Package Manager {#install-spm}
 
-GMObjC 从 3.3.0 开始支持 SPM，在工程中使用，点击 `File` -> `Swift Packages` -> `Add Package Dependency`，输入 [GMObjC 分支 URL](https://github.com/muzipiao/GMObjC.git)，或者在 Xcode 中添加 GitHub 账号，搜索 `GMObjC` 即可。
+GMObjC 从 3.3.0 开始支持 SPM，在工程中使用，点击 `File` -> `Swift Packages` -> `Add Package Dependency`，输入 URL `https://github.com/muzipiao/GMObjC.git`，或者在 Xcode 中添加 GitHub 账号，搜索 `GMObjC` 即可。
 
 如果在组件库中使用，更新 `Package.swift` 文件：
 
@@ -86,9 +86,9 @@ dependencies: [
 
 ### 手动编译为 Framework {#install-framework}
 
-可以从 GitHub 下载源码，打开项目 **GMObjC.xcodeproj** 手动编译为动态库`GMObjC.framework`。
+可以从 GitHub 下载源码，打开项目 **GMObjC.xcodeproj** 手动编译为动态库 `GMObjC.framework`。
 
-默认编译为**动态库**，如果需要编译为**静态库**，设置`Build Settings - Linking-General - Mach-O Type`为`Static Library`。
+默认编译为**动态库**，如果需要编译为**静态库**，设置 `Build Settings - Linking-General - Mach-O Type` 为 `Static Library`。
 
 **可合并为 XCFramework**
 
@@ -99,9 +99,9 @@ dependencies: [
 xcodebuild -create-xcframework -framework Release-iphoneos/GMObjC.framework -framework Release-iphonesimulator/GMObjC.framework -output GMObjC.xcframework
 # 或者换行展示更清晰
 xcodebuild -create-xcframework \
-          -framework Release-iphoneos/GMObjC.framework \
-          -framework Release-iphonesimulator/GMObjC.framework \
-          -output GMObjC.xcframework
+           -framework Release-iphoneos/GMObjC.framework \
+           -framework Release-iphonesimulator/GMObjC.framework \
+           -output GMObjC.xcframework
 ```
 
 ### 直接集成 {#install-source}

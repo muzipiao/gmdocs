@@ -3,7 +3,6 @@
 Private key signature and public key verification can prevent tampering or verify identity. The specific process is as follows:
 
 - **Signature**: Use the private key to sign the message and generate the signature value (`r` and `s`).
-
 - **Verify**: Use the public key to verify the signature to ensure that the message has not been tampered with and the signature is valid.
 
 ## SM2 signature verification {#signature-verify}

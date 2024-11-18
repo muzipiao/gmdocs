@@ -28,12 +28,12 @@ export const shared = defineConfig({
 
   /* prettier-ignore */
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/img/gmobjc-logo-square.svg' }],
-    ['link', { rel: 'icon', type: 'image/png', href: '/img/gmobjc-logo-square.png' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/gmdocs/img/gmobjc-logo-square.svg' }],
+    ['link', { rel: 'icon', type: 'image/png', href: '/gmdocs/img/gmobjc-logo-square.png' }],
     ['meta', { name: 'theme-color', content: '#5f67ee' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:locale', content: 'en' }],
-    ['meta', { property: 'og:title', content: 'GMObjC | GMObjC documentation.' }],
+    ['meta', { property: 'og:title', content: 'GMObjC | GMObjC Documentation' }],
     ['meta', { property: 'og:site_name', content: 'GMObjC' }],
     ['meta', { property: 'og:image', content: 'https://muzipiao.github.io/gmdocs/img/gmobjc-logo-rect.svg' }],
     ['meta', { property: 'og:url', content: 'https://github.com/muzipiao/GMObjC' }]
