@@ -1,3 +1,7 @@
+# GMDOCS
+
+GMDOCS 是使用 VitePress 为 [GMObjC](https://github.com/muzipiao/GMObjC) 编写的官方文档。**GMObjC** 是一个基于 OpenSSL 的国密（SM2、SM3、SM4）算法的 Objective-C 开源库，适用于 iOS 和 macOS 开发。它封装了中国国家密码管理局发布的多种加密算法。
+
 ## 安装
 
 ```shell
@@ -27,4 +31,3 @@ export default {
   }
 }
 ```
-
