@@ -2,8 +2,8 @@
 
 Due to changes in Apple's policies, your app may be rejected due to signature issues when it is put on the shelves. For details, please refer to [Apple's official third-party SDK privacy policy requirements](https://developer.apple.com/support/third-party-SDK-requirements/).
 
-::: warning SDK signature (Apple's official website describes it as follows)
-Now with SDK signature, when you use a new version of a third-party SDK in your app, Xcode will verify whether it is signed by the same developer, thereby improving the integrity of the software supply chain.
+::: warning Signatures for SDKs (Apple's official website describes it as follows)
+Now with signatures for SDKs, when you adopt a new version of a third-party SDK in your app, Xcode will validate that it was signed by the same developer, improving the integrity of your software supply chain.
 :::
 
 ## Binary file rejected due to signature review {#error-sign-detail}
