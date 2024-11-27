@@ -36,7 +36,17 @@ export const shared = defineConfig({
     ['meta', { property: 'og:title', content: 'GMObjC | GMObjC Documentation' }],
     ['meta', { property: 'og:site_name', content: 'GMObjC' }],
     ['meta', { property: 'og:image', content: 'https://muzipiao.github.io/gmdocs/img/gmobjc-logo-rect.svg' }],
-    ['meta', { property: 'og:url', content: 'https://github.com/muzipiao/GMObjC' }]
+    ['meta', { property: 'og:url', content: 'https://github.com/muzipiao/GMObjC' }],
+    ['script', 
+      {},
+      `var _hmt = _hmt || [];
+       (function() {
+         var hm = document.createElement("script");
+         hm.src = "https://hm.baidu.com/hm.js?91dc4ca59d32c885e504519ec5764e0a";
+         var s = document.getElementsByTagName("script")[0]; 
+         s.parentNode.insertBefore(hm, s);
+       })();`
+    ],
   ],
 
   themeConfig: {
