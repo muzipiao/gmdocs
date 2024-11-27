@@ -17,3 +17,10 @@
         --vp-home-hero-image-filter: blur(68px);
     }
 }
+
+/* 首页的【快速开始】在小屏手机上不显示 */
+@media (max-width: 600px) {
+    .actions .action:nth-child(2) a[href$="guide/getting-started"] {
+        display: none;
+    }
+}

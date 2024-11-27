@@ -20,7 +20,7 @@ export const shared = defineConfig({
 
   // 指定站点地图中所有链接的基础域名，并确保 url 属性的值不包含字符串 migration
   sitemap: {
-    hostname: "https://muzipiao.github.io/gmdocs",
+    hostname: "https://muzipiao.github.io/gmdocs/",
     transformItems(items) {
       return items.filter((item) => !item.url.includes("migration"));
     },
