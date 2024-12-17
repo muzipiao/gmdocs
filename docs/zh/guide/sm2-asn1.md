@@ -4,7 +4,7 @@
 
 ## SM2 中的 ASN1 编码解码 {#sm2-asn1}
 
-OpenSSL 对 SM2 加密结果进行了 **ASN1** 编码，解密时也要求密文编码格式为 **ASN1** 格式，密文可解码得到 **C1C3C2** 顺序拼接的原始密文。
+OpenSSL 对 SM2 加密结果进行了 **ASN1** 编码，解密时也要求密文编码格式为 **ASN1** 格式。GMObjC 提供了完整的 ASN1 编解码 API，支持密文格式转换。
 
 ```objc
 // 公钥
@@ -13,53 +13,44 @@ NSString *pubKey = @"0408E3FFF9505BCFAF9307E665E9229F4E1B3936437A870407EA3D97886
 // 私钥
 NSString *prikey = @"90F3A42B9FE24AB196305FD92EC82E647616C3A3694441FB3422E7838E24DEAE";
 
-// 明文（字符串类型）
+// 加密：明文 -> ASN1 格式密文（HEX 编码格式）
 NSString *plaintext = @"123456";
-
-// SM2 加密字符串类型，结果为 ASN1 格式的密文，并编码为 HEX 格式
 NSString *asn1Hex = [GMSm2Utils encryptText:plaintext publicKey:pubKey];
 
-// ASN1 解码为 C1C3C2 格式（HEX 编码格式）
+// 解码：ASN1 -> C1C3C2 格式（HEX 编码格式）
 NSString *c1c3c2Hex = [GMSm2Utils asn1DecodeToC1C3C2Hex:asn1Hex hasPrefix:NO];
+
+// 编码：C1C3C2 -> ASN1 格式
+NSString *asn1HexNew = [GMSm2Utils asn1EncodeWithC1C3C2Hex:c1c3c2Hex hasPrefix:NO];
 ```
 
-## 密文顺序 {#ciphertext-order}
+## 密文顺序转换 {#ciphertext-order}
 
-**ASN1** 密文解码得到的原始密文顺序默认为 **C1C3C2**，其他平台可能需要顺序为 **C1C2C3** 的密文，可根据需要转换。密文通常不包含 **04** 标识开头，参数 `hasPrefix` 传入 `NO` 即可。
+GMObjC 支持 **C1C3C2** 和 **C1C2C3** 两种密文格式的相互转换。密文通常不包含 **04** 标识开头，参数 `hasPrefix` 传入 `NO` 即可。
 
 ```objc
-// 密文顺序 C1C3C2 可转换为 C1C2C3（HEX 编码格式）
+// C1C3C2 转换为 C1C2C3（HEX 编码格式）
 NSString *c1c2c3Hex = [GMSm2Utils convertC1C3C2HexToC1C2C3:c1c3c2Hex hasPrefix:NO];
 
-// 密文顺序 C1C2C3 也可转换为 C1C3C2（HEX 编码格式）
+// C1C2C3 转换为 C1C3C2 （HEX 编码格式）
 NSString *c1c3c2Hex = [GMSm2Utils convertC1C2C3HexToC1C3C2:c1c2c3Hex hasPrefix:NO];
-
-// 将 C1C3C2 密文编码为 ASN1 格式（HEX 编码格式），解码再编码，加密结果不变
-NSString *asn1Hex = [GMSm2Utils asn1EncodeWithC1C3C2Hex:c1c3c2Hex2 hasPrefix:NO];
 ```
 
-**跨平台转换示例**
+### 跨平台场景示例
 
-例如 Java 端使用 BouncyCastle 进行 SM2 加密，得到密文可能是 **04** 标识开头，按照 **C1C2C3** 排列的密文。
-
-则客户端使用 OpenSSL 解密顺序为：
-
-1. 将密文排列顺序由 **C1C2C3** 转换为 **C1C3C2**；
-2. 将 **C1C3C2** 密文编码为 **ASN1** 格式密文；
-3. 使用`decryptHex:`解密 **ASN1** 格式密文，得到明文。
+当与其他平台对接时(如 Java 的 BouncyCastle)，可能需要处理不同的密文格式。
 
 ```objc
-// 假设 c1c2c3Hex 是 Java 端加密结果（HEX 编码格式）
+// 假设收到 Java 端的加密结果(C1C2C3 格式，带 04 前缀，HEX 编码格式)
 NSString *c1c2c3Hex = @"04FCB4D9E7230B45C20D07F0...F52BD65AB31D4B15BDA1C65";
-BOOL hasPrefix = YES // 有 04 标识，hasPrefix 参数设置为 YES。是否有标识，可通过观察或与其他平台确认
 
-// 先将密文顺序 C1C2C3 转换为 C1C3C2（HEX 编码格式）
-NSString *c1c3c2Hex = [GMSm2Utils convertC1C2C3HexToC1C3C2:c1c2c3Hex hasPrefix:hasPrefix];
+// 1. 转换为 C1C3C2 格式(保留 04 前缀，HEX 编码格式)
+NSString *c1c3c2Hex = [GMSm2Utils convertC1C2C3HexToC1C3C2:c1c2c3Hex hasPrefix:YES];
 
-// 将 C1C3C2 密文编码为 ASN1 格式（HEX 编码格式）
-NSString *asn1Hex = [GMSm2Utils asn1EncodeWithC1C3C2Hex:c1c3c2Hex2 hasPrefix:hasPrefix];
+// 2. 编码为 ASN1 格式（HEX 编码格式）
+NSString *asn1Hex = [GMSm2Utils asn1EncodeWithC1C3C2Hex:c1c3c2Hex hasPrefix:YES];
 
-// 使用私钥解密得到字符串明文 "123456"
+// 3. 解密得到明文
 NSString *plaintext = [GMSm2Utils decryptHex:asn1Hex privateKey:priKey];
 ```
 
@@ -71,16 +62,15 @@ NSString *plaintext = [GMSm2Utils decryptHex:asn1Hex privateKey:priKey];
 - **C2**：加密数据，即明文加密后的数据（与原始数据长度相同）
 :::
 
-**密文组合方式**：
-
-ASN1 解码密文后，得到的密文排列顺序为 C1C3C2（HEX 编码格式），已知 C1 长度固定为 128 字节，C3 长度固定为 64 字节，那数据 `C2 长度 = 密文字符串总长度 - C1 长度 128 字节 - C3 长度 64 字节`，这样就分别得到了 C1、C2、C3 字符串，自由拼接。
-
-**密文格式标识**
-
-OpenSSL 中加解密，公钥包含 **04** 标识，私钥和密文一般不包含 **密文格式标识**：
-
-::: info 常见标识
+::: info 密文格式标识
 - **02 或 03**：压缩表示形式
 - **04**：未压缩表示形式
 - **06 或 07**：混合表示形式
+:::
+
+::: tip hasPrefix 参数说明
+在调用 ASN1 编解码和密文转换相关 API 时，需要注意 `hasPrefix` 参数：
+- 当密文带有 **04** 前缀时，设置为 `YES`
+- 当密文不带前缀时，设置为 `NO`
+- 可以通过观察密文或与其他平台确认是否带有前缀
 :::

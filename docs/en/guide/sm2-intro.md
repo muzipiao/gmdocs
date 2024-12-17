@@ -1,10 +1,10 @@
 # SM2 Algorithm Principle {#sm2-intro}
 
-SM2 algorithm is an asymmetric algorithm standard of the chinese cryptography standard, based on the extension of ecc (Elliptic Curves Cryptography). When it comes to asymmetric encryption, RSA comes to mind. The difficulty of factoring extremely large integers determines the reliability of the RSA algorithm ([RSA Algorithm Understanding](https://muzipiao.github.io/2016/12/iOS-%E7%AB%AF-RSA-%E5%8A%A0%E5%AF%86/)), which is the basis of RSA security. So what is the algorithm basis of chinese cryptography encryption and decryption? First, let's understand the elliptic curve.
+SM2 algorithm is a national secret standard asymmetric algorithm, designed based on elliptic curve cryptography (ECC). Unlike RSA, which is based on the difficulty of factoring large integers, the security of SM2 is based on the elliptic curve discrete logarithm problem. If you need to understand RSA, you can refer to ([RSA Algorithm Understanding](https://muzipiao.github.io/2016/12/iOS-%E7%AB%AF-RSA-%E5%8A%A0%E5%AF%86/)).
 
 ## SM2 Elliptic Curve {#sm2-curves-graph}
 
-The algorithm of SM2 is based on the elliptic curve, formula:
+The elliptic curve equation used by SM2 is:
 
 $$y^2 = x^3 + ax + b \quad (4a^3 + 27b^2 ≠ 0)$$
 
@@ -12,17 +12,27 @@ What does the elliptic curve look like? Seeing is believing, and pictures can gi
 
 ![Elliptic Curve](/img/gmobjc-sm2-intro1.png)
 
-Why does it need to satisfy $4a^3 + 27b^2 ≠ 0$? Because when this formula is equal to 0, it is not an elliptic curve.
+Why does $4a^3 + 27b^2 ≠ 0$ need to be satisfied? Because when this formula is equal to 0, it is not an elliptic curve.
 
 ![ab value conditions](/img/gmobjc-sm2-intro2.png)
 
 ## SM2 public and private keys {#sm2-generate-keys}
 
-The algorithm is based on mathematics. SM2 defines group operations on the curve, such as addition, subtraction, and multiplication. It can be understood through **public and private key generation**. Combined with the following picture, let's understand the geometric meaning of SM2 and what **point doubling operations** are.
+SM2 key pair generation is based on point operations on elliptic curves. The main steps are as follows:
 
-![point doubling operations](/img/gmobjc-sm2-intro3.png)
+1. Select the elliptic curve parameters (a, b) and the base point G
+2. Randomly generate a private key d (a large integer)
+3. Calculate the public key Q = dG (d times G)
 
-1. First choose an elliptic curve, that is, the values ​​of a and b in the fixed formula $y^2 = x^3 + ax + b$. Assume that the curve shown in the figure above is selected.
+::: tip
+The private key is a large integer, and the public key is a point on the curve (including x and y coordinates)
+:::
+
+Combined with the following picture, let's understand the geometric meaning of SM2 and what **point doubling operation** is.
+
+![Point doubling operation](/img/gmobjc-sm2-intro3.png)
+
+1. First choose an elliptic curve, that is, the values ​​of a and b in the fixed formula $y^2 = x^3 + ax + b$, assuming that the curve shown in the figure above is selected.
 2. Randomly select a point P as the base point, make a tangent to the curve, pass through point Q, and tangent point R1.
 3. Based on the x-axis, make R the symmetric point of R1, then SM2 defines addition as P + Q = R, which is elliptic curve addition.
 4. Find the 2-fold point. When P = Q, that is, P + P = R = 2P, then R is the 2-fold point of P.
@@ -32,25 +42,25 @@ The algorithm is based on mathematics. SM2 defines group operations on the curve
 
 The above geometric reasoning is for easy understanding. The actual values ​​are all on the prime finite field. After reasoning and calculation, cryptography experts have selected the optimal elliptic curve on the prime finite field for us. Unless there is a special need, there is no need to customize the curve.
 
-## SM2 recommended curve {#sm2-recommend-curves}
+## SM2 recommended curves {#sm2-recommend-curves}
 
-![Recommended curve](/img/gmobjc-sm2-intro4.png)
+![Recommended curves](/img/gmobjc-sm2-intro4.png)
 
-- p: The set of points of the elliptic curve on the finite field Fp of prime number p;
+- p: the set of points of the elliptic curve on the finite field Fp of prime number p;
 
-- a: The value of the elliptic curve parameter a;
+- a: the value of the elliptic curve parameter a;
 
-- b: The value of the elliptic curve parameter b;
+- b: the value of the elliptic curve parameter b;
 
-- n: The value range, the value range of the random integer d $[1,n-2]$;
+- n: the value range, the value range of the random integer d $[1,n-2]$;
 
-- Gx: The x coordinate value of the base point, similar to the x coordinate value of point P;
+- Gx: the x coordinate value of the base point, similar to the x coordinate value of point P;
 
-- Gy: The y coordinate value of the base point, similar to the y coordinate value of point P.
+- Gy: the y coordinate value of the base point, similar to the y coordinate value of point P.
 
 ## SM2 encryption {#sm2-encrypt-steps}
 
-The length of the SM2 encryption result is fixed. For example, if the password is 123456, which is a 6-digit number, the encrypted ciphertext length = 64 + 32 + 6 = 102 bytes, and the result of converting to a hexadecimal string is 204 characters. If the original text length is n, the encrypted result length $r = 96 + n$.
+The length of the SM2 encryption result is predictable: for a plaintext of length n bytes, the encrypted ciphertext length is $(96 + n)$ bytes.
 
 **Encryption process**:
 
@@ -67,7 +77,8 @@ Let the elliptic curve be the recommended curve, the public key Q, the original 
 7. Output the ciphertext $C=C1||C3||C2$, C is the ciphertext result.
 
 ::: info Note
-The OpenSSL encryption result is formatted and encoded in ASN1, and the length of the encryption result will not be fixed. Random numbers are used in the process, so the encryption result is different each time.
+- The implementation of OpenSSL uses ASN.1 encoding, so the ciphertext length may not be fixed
+- Due to the use of random numbers, the encryption results are different each time
 :::
 
 ## SM2 decryption {#sm2-decrypt-steps}

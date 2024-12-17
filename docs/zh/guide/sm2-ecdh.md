@@ -6,37 +6,45 @@ ECDH（Elliptic Curve Diffie-Hellman）是一种基于椭圆曲线的密钥交�
 2. **共享密钥计算**：每一方使用对方的公钥和自己的私钥，通过椭圆曲线运算生成相同的共享密钥。
 3. **结果**：双方得到相同的共享密钥，可以用于对称加密通信。
 
-ECDH 的安全性依赖于椭圆曲线离散对数问题，OpenSSL 中的 `ECDH_compute_key()`执行椭圆曲线 Diffie-Hellman 密钥协商，可在双方都是明文传输的情况下，协商出一个相同的密钥。
+ECDH 的安全性依赖于椭圆曲线离散对数问题。在 GMObjC 中，`computeECDH:privateKey:`方法实现了基于 SM2 曲线的 ECDH 密钥协商，可在双方都是明文传输的情况下，协商出一个相同的密钥。
 
 ## ECDH 示例 {#sm2-ecdh-sample}
 
-1. 客户端随机生成一对公私钥 clientPublicKey，clientPrivateKey；
-2. 服务端随机生成一对公私钥 serverPublicKey，serverPrivateKey；
-3. 双方利用网络请求或其他方式交换公钥 clientPublicKey 和 serverPublicKey，私钥自己保存；
-4. 客户端计算`clientECDH = [GMSm2Utils computeECDH:serverPubKey privateKey:clientPriKey]`；
-5. 服务端计算`serverECDH = [GMSm2Utils computeECDH:clientPubKey privateKey:serverPriKey]`；
-6. 双方各自计算出的 clientECDH 和 serverECDH 应该是相等的，这个 key 可以作为对称加密的密钥。
+1. 客户端随机生成一对公私钥（clientPublicKey，clientPrivateKey）
+2. 服务端随机生成一对公私钥（serverPublicKey，serverPrivateKey）
+3. 双方通过网络交换各自的公钥，私钥自己保存
+4. 双方各自计算共享密钥：
+   - 客户端：使用服务端公钥和自己的私钥计算
+   - 服务端：使用客户端公钥和自己的私钥计算
+5. 双方计算出的共享密钥应该完全相同，可用作后续通信的对称加密密钥
 
 ```objc
-// 客户端client生成一对公私钥
- GMSm2Key *clientKey = [GMSm2Utils generateKey];
- NSString *clientPubKey = clientKey.publicKey;
- NSString *clientPriKey = clientKey.privateKey;
+// 客户端生成密钥对
+GMSm2Key *clientKey = [GMSm2Utils generateKey];
+NSString *clientPubKey = clientKey.publicKey;   // 04开头的公钥
+NSString *clientPriKey = clientKey.privateKey;  // 私钥
  
- // 服务端server生成一对公私钥
- GMSm2Key *serverKey = [GMSm2Utils generateKey];
- NSString *serverPubKey = serverKey.publicKey;
- NSString *serverPriKey = serverKey.privateKey;
+// 服务端生成密钥对
+GMSm2Key *serverKey = [GMSm2Utils generateKey];
+NSString *serverPubKey = serverKey.publicKey;   // 04开头的公钥
+NSString *serverPriKey = serverKey.privateKey;  // 私钥
  
- // 客户端client从服务端server获取公钥serverPubKey，client协商出32字节对称密钥clientECDH，转Hex后为64字节
- NSString *clientECDH = [GMSm2Utils computeECDH:serverPubKey privateKey:clientPriKey];
- // 客户端client将公钥clientPubKey发送给服务端server，server协商出32字节对称密钥serverECDH，转Hex后为64字节
- NSString *serverECDH = [GMSm2Utils computeECDH:clientPubKey privateKey:serverPriKey];
+// 客户端计算共享密钥 (使用服务端公钥和自己的私钥)
+NSString *clientECDH = [GMSm2Utils computeECDH:serverPubKey privateKey:clientPriKey];
+// 服务端计算共享密钥 (使用客户端公钥和自己的私钥)
+NSString *serverECDH = [GMSm2Utils computeECDH:clientPubKey privateKey:serverPriKey];
 
-// 在全部明文传输的情况下，client与server协商出相等的对称密钥，clientECDH==serverECDH 成立
+// 验证双方计算的密钥是否相同
 if ([clientECDH isEqualToString:serverECDH]) {
-    NSLog(@"ECDH 密钥协商成功，协商出的对称密钥为：\n%@", clientECDH);
-}else{
-    NSLog(@"ECDH 密钥协商失败");
+   NSLog(@"ECDH 密钥协商成功，协商出的对称密钥为：\n%@", clientECDH);
+} else {
+   NSLog(@"ECDH 密钥协商失败");
 }
 ```
+
+::: info 注意事项
+- 生成的共享密钥为 32 字节，转 Hex 编码后为 64 字节的字符串
+- 默认使用 SM2 推荐曲线（NID_sm2）
+- 公钥为 04 开头的未压缩格式
+- 所有密钥均采用 16 进制字符串格式
+:::

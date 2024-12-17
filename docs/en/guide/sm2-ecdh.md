@@ -1,4 +1,4 @@
-# ECDH key negotiation {#sm2-ecdh}
+# ECDH Key Agreement {#sm2-ecdh}
 
 ECDH (Elliptic Curve Diffie-Hellman) is a key exchange protocol based on elliptic curves that allows two parties to securely share a common key over an insecure channel. The basic process is as follows:
 
@@ -6,37 +6,45 @@ ECDH (Elliptic Curve Diffie-Hellman) is a key exchange protocol based on ellipti
 2. **Shared key calculation**: Each party uses the other party's public key and its own private key to generate the same shared key through elliptic curve operations.
 3. **Result**: Both parties obtain the same shared key, which can be used for symmetric encryption communication.
 
-The security of ECDH depends on the elliptic curve discrete logarithm problem. `ECDH_compute_key()` in OpenSSL performs elliptic curve Diffie-Hellman key negotiation, which can negotiate an identical key when both parties are transmitting in plain text.
+The security of ECDH depends on the elliptic curve discrete logarithm problem. In GMObjC, the `computeECDH:privateKey:` method implements ECDH key agreement based on the SM2 curve, which can negotiate an identical key when both parties are transmitting in plain text.
 
-## ECDH example {#sm2-ecdh-sample}
+## ECDH Example {#sm2-ecdh-sample}
 
-1. The client randomly generates a pair of public and private keys clientPublicKey, clientPrivateKey;
-2. The server randomly generates a pair of public and private keys serverPublicKey, serverPrivateKey;
-3. Both parties use network requests or other methods to exchange public keys clientPublicKey and serverPublicKey, and keep the private key by themselves;
-4. The client calculates `clientECDH = [GMSm2Utils computeECDH:serverPubKey privateKey:clientPriKey]`;
-5. The server calculates `serverECDH = [GMSm2Utils computeECDH:clientPubKey privateKey:serverPriKey]`;
-6. The clientECDH and serverECDH calculated by both parties should be equal, and this key can be used as the key for symmetric encryption.
+1. The client randomly generates a pair of public and private keys (clientPublicKey, clientPrivateKey)
+2. The server randomly generates a pair of public and private keys (serverPublicKey, serverPrivateKey)
+3. Both parties exchange their public keys through the network, and keep their private keys
+4. Both parties calculate the shared key:
+   - Client: Calculate using the server public key and its own private key
+   - Server: Calculate using the client public key and its own private key
+5. The shared keys calculated by both parties should be exactly the same and can be used as symmetric encryption keys for subsequent communications
 
 ```objc
-// The client generates a pair of public and private keys
+// Client generates a key pair
 GMSm2Key *clientKey = [GMSm2Utils generateKey];
-NSString *clientPubKey = clientKey.publicKey;
-NSString *clientPriKey = clientKey.privateKey;
+NSString *clientPubKey = clientKey.publicKey; // Public key starting with 04
+NSString *clientPriKey = clientKey.privateKey; // Private key
 
-// The server generates a pair of public and private keys
+// Server generates a key pair
 GMSm2Key *serverKey = [GMSm2Utils generateKey];
-NSString *serverPubKey = serverKey.publicKey;
-NSString *serverPriKey = serverKey.privateKey;
+NSString *serverPubKey = serverKey.publicKey; // Public key starting with 04
+NSString *serverPriKey = serverKey.privateKey; // Private key
 
-// The client obtains the public key serverPubKey from the server, and the client negotiates a 32-byte symmetric key clientECDH, which is 64 bytes after conversion to Hex
+// Client calculates shared key (using server public key and its own private key)
 NSString *clientECDH = [GMSm2Utils computeECDH:serverPubKey privateKey:clientPriKey];
-// The client sends the public key clientPubKey to the server, and the server negotiates a 32-byte symmetric key serverECDH, which is 64 bytes after conversion to Hex
+// Server calculates shared key (using client public key and its own private key)
 NSString *serverECDH = [GMSm2Utils computeECDH:clientPubKey privateKey:serverPriKey];
 
-// In the case of all plaintext transmission, the client and server negotiated equal symmetric keys, and clientECDH==serverECDH holds
+// Verify that the keys calculated by both parties are the same
 if ([clientECDH isEqualToString:serverECDH]) {
-    NSLog(@"ECDH key negotiation succeeded, the negotiated symmetric key is:\n%@", clientECDH);
-}else{
-    NSLog(@"ECDH key negotiation failed");
+   NSLog(@"ECDH key negotiation succeeded, the negotiated symmetric key is:\n%@", clientECDH);
+} else {
+   NSLog(@"ECDH key negotiation failed");
 }
 ```
+
+::: info Notes
+- The generated shared key is 32 bytes, which is converted to a 64-byte string after Hex encoding
+- The SM2 recommended curve (NID_sm2) is used by default
+- The public key is in uncompressed format starting with 04
+- All keys are in hexadecimal string format
+:::

@@ -1,10 +1,10 @@
 # ASN1 encoding and decoding {#asn1-encode-decode}
 
-**ASN.1** (Abstract Syntax Notation One) is a standard format for describing and representing data structures. Its main function is to standardize data representation and encoding across platforms, so that different systems can correctly understand and process complex data structures, especially in security and encryption applications.
+**ASN.1** (Abstract Syntax Notation One) is a standard format for describing and representing data structures. Its main function is to standardize data representation and encoding across platforms so that different systems can correctly understand and process complex data structures, which is especially common in security and encryption applications.
 
 ## ASN1 encoding and decoding in SM2 {#sm2-asn1}
 
-OpenSSL encodes the SM2 encryption result in **ASN1** format, and the ciphertext encoding format is also required to be **ASN1** format when decrypting. The ciphertext can be decoded to obtain the original ciphertext of **C1C3C2** sequential splicing.
+OpenSSL encodes the SM2 encryption result in **ASN1** format, and the ciphertext encoding format is also required to be **ASN1** format when decrypting. GMObjC provides a complete ASN1 encoding and decoding API, supporting ciphertext format conversion.
 
 ```objc
 // Public key
@@ -13,76 +13,64 @@ NSString *pubKey = @"0408E3FFF9505BCFAF9307E665E9229F4E1B3936437A870407EA3D97886
 // Private key
 NSString *prikey = @"90F3A42B9FE24AB196305FD92EC82E647616C3A3694441FB3422E7838E24DEAE";
 
-// Plain text (string type)
+// Encryption: Plain text -> ASN1 format ciphertext (HEX encoding format)
 NSString *plaintext = @"123456";
-
-// SM2 encrypted string type, the result is ASN1 format ciphertext, and encoded in HEX format
 NSString *asn1Hex = [GMSm2Utils encryptText:plaintext publicKey:pubKey];
 
-// ASN1 decoded to C1C3C2 format (HEX encoding format)
+// Decode: ASN1 -> C1C3C2 format (HEX encoding format)
 NSString *c1c3c2Hex = [GMSm2Utils asn1DecodeToC1C3C2Hex:asn1Hex hasPrefix:NO];
+
+// Encode: C1C3C2 -> ASN1 format
+NSString *asn1HexNew = [GMSm2Utils asn1EncodeWithC1C3C2Hex:c1c3c2Hex hasPrefix:NO];
 ```
 
-## Ciphertext order {#ciphertext-order}
+## Ciphertext order conversion {#ciphertext-order}
 
-**ASN1** ciphertext decoded original ciphertext order defaults to **C1C3C2**, other platforms may require **C1C2C3** ciphertext order, can be converted as needed. Ciphertext usually does not contain **04** identifier at the beginning, parameter `hasPrefix` passes `NO`.
+GMObjC supports conversion between **C1C3C2** and **C1C2C3** ciphertext formats. Ciphertext usually does not contain the **04** identifier at the beginning, so `NO` can be passed to the parameter `hasPrefix`.
 
 ```objc
-// Ciphertext sequence C1C3C2 can be converted to C1C2C3 (HEX encoding format)
+// Convert C1C3C2 to C1C2C3 (HEX encoding format)
 NSString *c1c2c3Hex = [GMSm2Utils convertC1C3C2HexToC1C2C3:c1c3c2Hex hasPrefix:NO];
 
-// Ciphertext sequence C1C2C3 can also be converted to C1C3C2 (HEX encoding format)
+// Convert C1C2C3 to C1C3C2 (HEX encoding format)
 NSString *c1c3c2Hex = [GMSm2Utils convertC1C2C3HexToC1C3C2:c1c2c3Hex hasPrefix:NO];
-
-// Encode C1C3C2 ciphertext to ASN1 format (HEX encoding format), decode and re-encode, the encryption result remains unchanged
-NSString *asn1Hex = [GMSm2Utils asn1EncodeWithC1C3C2Hex:c1c3c2Hex2 hasPrefix:NO];
 ```
 
-**Cross-platform conversion example**
+### Cross-platform scenario example
 
-For example, the Java end uses BouncyCastle for SM2 encryption, and the ciphertext obtained may be a ciphertext starting with the **04** identifier and arranged in **C1C2C3**.
-
-Then the client uses OpenSSL to decrypt the order as follows:
-
-1. Convert the ciphertext arrangement order from **C1C2C3** to **C1C3C2**;
-
-2. Encode the **C1C3C2** ciphertext into **ASN1** format ciphertext;
-
-3. Use `decryptHex:` to decrypt the **ASN1** format ciphertext and obtain the plaintext.
+When connecting to other platforms (such as Java's BouncyCastle), you may need to handle different ciphertext formats.
 
 ```objc
-// Assume c1c2c3Hex is the encryption result on the Java side (HEX encoding format)
+// Assume that the encryption result received from the Java side (C1C2C3 format, with 04 prefix, HEX encoding format)
 NSString *c1c2c3Hex = @"04FCB4D9E7230B45C20D07F0...F52BD65AB31D4B15BDA1C65";
-BOOL hasPrefix = YES // There is a 04 flag, and the hasPrefix parameter is set to YES. Whether there is an identification can be confirmed by observation or with other platforms
 
-// First convert the ciphertext sequence C1C2C3 to C1C3C2 (HEX encoding format)
-NSString *c1c3c2Hex = [GMSm2Utils convertC1C2C3HexToC1C3C2:c1c2c3Hex hasPrefix:hasPrefix];
+// 1. Convert to C1C3C2 format (keep 04 prefix, HEX encoding format)
+NSString *c1c3c2Hex = [GMSm2Utils convertC1C2C3HexToC1C3C2:c1c2c3Hex hasPrefix:YES];
 
-// Encode the C1C3C2 ciphertext to ASN1 format (HEX encoding format)
-NSString *asn1Hex = [GMSm2Utils asn1EncodeWithC1C3C2Hex:c1c3c2Hex2 hasPrefix:hasPrefix];
+// 2. Encode to ASN1 format (HEX encoding format)
+NSString *asn1Hex = [GMSm2Utils asn1EncodeWithC1C3C2Hex:c1c3c2Hex hasPrefix:YES];
 
-// Use the private key to decrypt and get the string plaintext "123456"
+// 3. Decrypt to get plaintext
 NSString *plaintext = [GMSm2Utils decryptHex:asn1Hex privateKey:priKey];
 ```
 
-## Knowledge Supplement {#knowledge-supplement}
+## Knowledge supplement {#knowledge-supplement}
 
-::: info C1C3C2 Meaning
+::: info C1C3C2 meaning
 - **C1**: Elliptic curve point, including x and y coordinates (x and y are 32 bytes respectively, a total of 64 bytes, and the Hex format is 128 bytes)
-- **C3**: Message authentication code, that is, the digest value (SM3 digest value is 32 bytes, and the HEX encoding format is 64 bytes)
-- **C2**: Encrypted data, that is, the encrypted plaintext data (the same length as the original data)
+- **C3**: Message authentication code, that is, the summary value (SM3 summary value 32 bytes, HEX encoding format is 64 bytes)
+- **C2**: Encrypted data, that is, the encrypted plaintext data (same length as the original data)
 :::
 
-**Ciphertext combination method**:
+::: info Ciphertext format identifier
+- **02 or 03**: Compressed representation
+- **04**: Uncompressed representation
+- **06 or 07**: Mixed representation
+:::
 
-After ASN1 decodes the ciphertext, the ciphertext arrangement order is C1C3C2 (HEX encoding format). It is known that the length of C1 is fixed to 128 bytes and the length of C3 is fixed to 64 bytes. Then the data `C2 length = the total length of the ciphertext string - C1 length 128 bytes - C3 length 64 Bytes`, so we get C1, C2, C3 strings respectively, which can be freely spliced.
-
-**Ciphertext format identifier**
-
-In OpenSSL encryption and decryption, the public key contains the **04** identifier, while the private key and ciphertext generally do not contain the **Ciphertext format identifier**:
-
-::: info Common identifiers
-- **02 or 03**: compressed representation
-- **04**: uncompressed representation
-- **06 or 07**: mixed representation
+::: tip hasPrefix parameter description
+When calling ASN1 encoding and decoding and ciphertext conversion related APIs, you need to pay attention to the `hasPrefix` parameter:
+- When the ciphertext has a **04** prefix, set it to `YES`
+- When the ciphertext does not have a prefix, set it to `NO`
+- You can confirm whether it has a prefix by observing the ciphertext or with other platforms
 :::

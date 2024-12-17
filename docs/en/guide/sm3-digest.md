@@ -1,42 +1,53 @@
 # SM3 Digest {#sm3-digest-intro}
 
-Similar to MD5, SHA1 and other digest algorithms, GMSm3Utils is a tool class for implementing SM3 digest algorithm and HMAC message authentication code.
+Similar to MD5, SHA1 and other digest algorithms, GMSm3Utils is a tool class for implementing SM3 digest algorithm and HMAC message authentication code. The SM3 digest algorithm key is any non-null character, the output digest length is 32 bytes, and the length after conversion to hexadecimal string is 64 characters.
 
 ## SM3 Digest Calculation {#sm3-digest}
 
-SM3 digest algorithm can perform digest calculation on text and files. SM3 digest length is 64 bytes HEX encoding format string.
+SM3 digest algorithm supports digest calculation of text strings and binary data.
 
 ```objc
-// String input, return hexadecimal digest
+// String input, return digest string in hexadecimal format
 NSString *digest = [GMSm3Utils hashWithText:@"Hello, SM3!"];
 
-// Binary data input, return byte array
+// Binary data input, return digest in byte array format
 NSData *data = [@"Binary Data" dataUsingEncoding:NSUTF8StringEncoding];
 NSData *digest = [GMSm3Utils hashWithData:data];
 ```
 
 ## HMAC calculation {#sm3-hmac}
 
-By default, **SM3** algorithm is used to calculate HMAC, and other algorithms such as MD5, SHA1, SHA224/256/384/512 are supported.
+HMAC supports multiple digest algorithms, and SM3 is used by default. Supported algorithm types include:
+
+- SM3 (default)
+- MD5
+- SHA1
+- SHA224
+- SHA256
+- SHA384
+- SHA512
+
+### Basic HMAC calculation (using the default SM3 algorithm)
 
 ```objc
-// Calculate HMAC digest using SM3 by default
+// Input in string format, return the HMAC digest in hexadecimal format
 NSString *hmac = [GMSm3Utils hmacWithText:@"Message" keyText:@"SecretKey"];
 
-// NSData format of plain text 123456
+// Input in binary data format, return the HMAC digest in byte array format
 NSData *plainData = [@"123456" dataUsingEncoding:NSUTF8StringEncoding];
-// Key used for encryption
+NSData *keyData = [@"SecretKey" dataUsingEncoding:NSUTF8StringEncoding];
+NSData *hmac = [GMSm3Utils hmacWithData:plainData keyData:keyData];
+```
+
+### Calculate HMAC with specified algorithm type
+
+```objc
+// NSData format of plain text 123456, the key used for encryption is any non-empty
+NSData *plainData = [@"123456" dataUsingEncoding:NSUTF8StringEncoding];
 NSData *keyData = [@"qwertyuiop1234567890" dataUsingEncoding:NSUTF8StringEncoding];
-// Calculate HMAC digest using MD5
+
+// Calculate HMAC using different algorithms
 NSData *hmacMD5 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_MD5];
-// Calculate HMAC digest using SHA1
-NSData *hmacSHA1 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA1]; 
-// Calculate HMAC digest using SHA224 
-NSData *hmacSHA224 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA224]; 
-// Calculate HMAC digest using SHA256 
-NSData *hmacSHA256 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA256]; 
-// Calculate HMAC digest using SHA384 
-NSData *hmacSHA384 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA384]; 
-// Calculate HMAC digest using SHA512 
-NSData *hmacSHA512 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA512]; 
+NSData *hmacSHA1 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA1];
+NSData *hmacSHA224 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA224]; NSData *hmacSHA256 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA256]; NSData *hmacSHA384 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA384]; NSData *hmacSHA512 = [GMSm3Utils hmacWithData:plainData keyData:keyData keyType:GMHashType_SHA512]; // String format input, specify algorithm type NSString *hmacSHA512 = [GMSm3Utils hmacWithText:@"Message" keyText:@"SecretKey" keyType:GMHashType_SHA512]; 
 ```

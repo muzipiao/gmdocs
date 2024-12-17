@@ -1,81 +1,84 @@
 # SM4 encryption and decryption {#sm4-encrypt-intro}
 
-SM4 symmetric encryption is relatively simple. For encryption, pass in **plaintext** and **key**, and for decryption, pass in **ciphertext** and **key**. GMSm4Utils is an Objective-C implementation of the SM4 block cipher algorithm, supporting both ECB and CBC encryption modes.
+SM4 is a national symmetric encryption algorithm. GMSm4Utils provides its Objective-C implementation. It supports two encryption modes, ECB and CBC, and can be used to encrypt binary data or strings.
 
-::: info Features
-- ECB electronic codebook mode, ciphertext is divided into blocks of equal length (filled if insufficient), and encrypted block by block.
-- CBC ciphertext block chaining mode, the ciphertext of the previous block and the plaintext of the current block are XORed and then encrypted.
-- Padding method: SM4 encryption requires 16-bit alignment, using PKCS7Padding for padding.
-- Key length: 16 bytes (32 bytes in HEX format)
-- CBC mode requires a 16-byte (32-byte HEX format) initialization vector (IV)
+::: info Feature introduction
+- **Block size**: 16 bytes
+- **Key length**: 16 bytes (32 characters when HEX encoded)
+- **Padding method**: PKCS7Padding (automatically fill to multiples of 16 bytes)
+- **Encryption mode**:
+  - ECB (Electronic Codebook Mode): Split the plaintext into fixed block sizes (16 bytes) (fill if insufficient), and encrypt each block one by one.
+  - CBC (Ciphertext Block Chaining Mode): Each plaintext block is first XORed with the previous ciphertext block before encryption, requiring a 16-byte initial vector (IV), which is more secure.
 :::
 
 ## Key generation {#sm4-generate-key}
 
 ```objc
-// Returns a 32-character HEX string, e.g. CCDEE6FB253E1CBCD40B12D5E230D0F4
+// Generate a 32-character HEX format key. Output example: CCDEE6FB253E1CBCD40B12D5E230D0F4
 NSString *key = [GMSm4Utils generateKey];
 ```
 
 ## ECB mode {#sm4-ecb}
 
-::: warning
-Key length, 16 bytes in string format, 32 bytes in HEX format.
+::: warning Note
+Key format requirements:
+- String mode: 32-character HEX string
+- Binary mode: 16-byte NSData
 :::
 
 ### Binary data processing
 
 ```objc
-// Binary data encryption and decryption, the key is a 16-byte string
-NSData *sm4KeyData = [@"0123456789abcdef" dataUsingEncoding:NSUTF8StringEncoding];
-NSData *plainData = [@"123456" dataUsingEncoding:NSUTF8StringEncoding];
-// Encryption. The ciphertext is an NSData data block
-NSData *cipherData = [GMSm4Utils encryptDataWithECB:plainData keyData:sm4KeyData];
-// Decryption. The result is a data block format of 123456 (313233343536)
-NSData *decrypted = [GMSm4Utils decryptDataWithECB:cipherData keyData:sm4KeyData];
-```
-
-### String encryption
-
-```objc
-// String encryption and decryption, HEX encoding format key length is 32 bytes
-NSString *sm4KeyHex = @"0123456789abcdef0123456789abcdef";
+// 1. String encryption (using HEX format key)
+NSString *sm4KeyHex = @"CCDEE6FB253E1CBCD40B12D5E230D0F4";
 NSString *plaintext = @"Hello, SM4!";
 // Encryption. The ciphertext is in HEX encoding format
-NSString *ciphertext = [GMSm4Utils encryptTextWithECB:plaintext keyHex:sm4KeyHex];
+NSString *cipherHex = [GMSm4Utils encryptTextWithECB:plaintext keyHex:sm4KeyHex];
 // Decryption. The decrypted result is "Hello, SM4!"
-NSString *decrypted = [GMSm4Utils decryptTextWithECB:ciphertext keyHex:sm4KeyHex];
+NSString *decrypted = [GMSm4Utils decryptTextWithECB:cipherHex keyHex:sm4KeyHex];
+
+// 2. Binary data encryption
+// Convert the HEX format key to NSData
+NSData *sm4KeyData = [GMSmUtils dataFromHexString:sm4KeyHex];
+// Or directly use a 16-byte string to NSData
+// NSData *sm4KeyData = [@"0123456789abcdef" dataUsingEncoding:NSUTF8StringEncoding];
+
+NSData *plainData = [@"123456" dataUsingEncoding:NSUTF8StringEncoding];
+// Encryption
+NSData *cipherData = [GMSm4Utils encryptDataWithECB:plainData keyData:sm4KeyData];
+// Decryption
+NSData *decrypted = [GMSm4Utils decryptDataWithECB:cipherData keyData:sm4KeyData];
 ```
 
 ## CBC mode {#sm4-cbc}
 
-::: tip Note
-- The key and IV must be 16 bytes long (the HEX-encoded key/IV length is 32 characters)
-- The same IV must be used for encryption and decryption in CBC mode
+::: tip
+- Both the key and IV must be 16 bytes long (the HEX-encoded key/IV length is 32 bytes).
+- The same IV must be used for encryption and decryption. The IV vector can be regarded as a random number of fixed length.
+- CBC mode is more secure than ECB and is recommended for sensitive data encryption.
 :::
 
-### Binary data processing
-
 ```objc
-// Binary data encryption and decryption, the key is a 16-byte string
-NSData *sm4KeyData = [@"0123456789abcdef" dataUsingEncoding:NSUTF8StringEncoding];
-NSData *ivecData = [@"0123456789abcdef" dataUsingEncoding:NSUTF8StringEncoding];
-NSData *plainData = [@"123456" dataUsingEncoding:NSUTF8StringEncoding];
-// Encryption. The ciphertext is an NSData data block
-NSData *cipherData = [GMSm4Utils encryptDataWithCBC:plainData keyData:sm4KeyData ivecData:ivecData];
-// Decryption. The result is a data block format of 123456 (313233343536)
-NSData *decrypted = [GMSm4Utils decryptDataWithCBC:cipherData keyData:sm4KeyData ivecData:ivecData];
-```
-
-### String encryption
-
-```objc
-NSString *keyHex = @"0123456789abcdef0123456789abcdef";
-NSString *ivecHex = @"0123456789abcdef0123456789abcdef";
+// 1. String encryption (using HEX format key and IV)
+NSString *sm4KeyHex = @"CCDEE6FB253E1CBCD40B12D5E230D0F4";
+NSString *ivecHex = @"CCDEE6FB253E1CBCD40B12D5E230D0F4";
 NSString *plaintext = @"Hello, SM4!";
-
-// Encryption. The ciphertext is in HEX encoding format
-NSString *ciphertext = [GMSm4Utils encryptTextWithCBC:plaintext keyHex:keyHex ivecHex:ivecHex];
+// Encryption. Output HEX format ciphertext
+NSString *ciphertext = [GMSm4Utils encryptTextWithCBC:plaintext keyHex:sm4KeyHex ivecHex:ivecHex];
 // Decryption. The decrypted result is "Hello, SM4!"
-NSString *decrypted = [GMSm4Utils decryptTextWithCBC:ciphertext keyHex:keyHex ivecHex:ivecHex];
+NSString *decrypted = [GMSm4Utils decryptTextWithCBC:ciphertext keyHex:sm4KeyHex ivecHex:ivecHex];
+
+// 2. Binary data encryption
+// Convert HEX format key and IV to NSData
+NSData *sm4KeyData = [GMSmUtils dataFromHexString:sm4KeyHex];
+NSData *ivecData = [GMSmUtils dataFromHexString:ivecHex];
+// Or directly use 16-byte string to NSData
+// NSData *sm4KeyData = [@"0123456789abcdef" dataUsingEncoding:NSUTF8StringEncoding];
+// NSData *ivecData = [@"0123456789abcdef" dataUsingEncoding:NSUTF8StringEncoding];
+
+NSData *plainData = [@"123456" dataUsingEncoding:NSUTF8StringEncoding];
+// Encrypt 
+NSData *cipherData = [GMSm4Utils encryptDataWithCBC:plainData keyData:sm4KeyData ivecData:ivecData];
+// Decrypt 
+NSData *decrypted = [GMSm4Utils decryptDataWithCBC:cipherData keyData:sm4KeyData ivecData:ivecData];
 ```
