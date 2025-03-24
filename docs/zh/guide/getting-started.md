@@ -41,7 +41,10 @@ open GMObjC.xcworkspace
 CocoaPods 是最简单方便的集成方法，编辑 Podfile 文件，添加：
 
 ```ruby
-pod 'GMObjC'
+# 安装 GMObjC 的源码和 GMOpenSSL.xcframework (静态库)
+pod 'GMObjC', '~> 4.0.3'
+# 当 Podfile 中使用 use_frameworks! 时，安装 GMObjC.xcframework (动态库)
+pod 'GMDynamic', '~> 4.0.3'
 ```
 
 然后执行 `pod install` 即可，项目会自动集成 **GMObjC** 和 **GMOpenSSL** 开源库。

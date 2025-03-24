@@ -41,7 +41,10 @@ The following are the methods to use GMObjC in your project:
 CocoaPods is the simplest and most convenient integration method. Edit the Podfile file and add:
 
 ```ruby
-pod 'GMObjC'
+# Install GMObjC source code and GMOpenSSL.xcframework (static library)
+pod 'GMObjC', '~> 4.0.3'
+# When use_frameworks! is used in Podfile, install GMObjC.xcframework (dynamic library)
+pod 'GMDynamic', '~> 4.0.3'
 ```
 
 Then execute `pod install`, and the project will automatically integrate the **GMObjC** and **GMOpenSSL** open source libraries.
