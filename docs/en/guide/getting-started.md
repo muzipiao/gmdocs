@@ -38,7 +38,12 @@ The following are the methods to use GMObjC in your project:
 
 ### CocoaPods {#install-cocoapods}
 
-CocoaPods is the simplest and most convenient integration method. Edit the Podfile file and add:
+CocoaPods is the simplest and most convenient integration method. Edit the Podfile and add:
+
+::: tip Note
+1. Only one of GMObjC and GMDynamic can be installed - they cannot be installed at the same time.
+2. GMObjC is a static library, while GMDynamic is the precompiled dynamic library version of GMObjC.
+:::
 
 ```ruby
 # Install GMObjC source code and GMOpenSSL.xcframework (static library)
@@ -52,7 +57,7 @@ Then execute `pod install`, and the project will automatically integrate the **G
 ::: warning Note
 1. GMObjC depends on **OpenSSL 1.1.1l** or above. CocoaPods does not support different versions of the same static library.
 2. If there is a conflict with OpenSSL in a third-party library, such as Baidu MapKit, which depends on a lower version of OpenSSL static library, dependency conflicts will occur.
-3. If you encounter an OpenSSL conflict, refer to [Conflict Solution](./error-openssl) and compile GMObjC into a dynamic library to resolve it.
+3. If you encounter OpenSSL conflicts, refer to [Conflict Resolution](./error-openssl). Using the dynamic library version addresses this issue.
 :::
 
 ### Carthage {#install-carthage}

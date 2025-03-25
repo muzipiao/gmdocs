@@ -40,6 +40,11 @@ open GMObjC.xcworkspace
 
 CocoaPods 是最简单方便的集成方法，编辑 Podfile 文件，添加：
 
+::: tip 注意
+1. GMObjC 和 GMDynamic 只能安装其中一个，二者不能同时安装。
+2. GMObjC 为静态库，GMDynamic 为编译好的 GMObjC 动态库版本。
+:::
+
 ```ruby
 # 安装 GMObjC 的源码和 GMOpenSSL.xcframework (静态库)
 pod 'GMObjC', '~> 4.0.3'
@@ -52,7 +57,7 @@ pod 'GMDynamic', '~> 4.0.3'
 ::: warning 注意
 1. GMObjC 依赖 **OpenSSL 1.1.1l** 以上版本，CocoaPods 不支持依赖同一静态库库的不同版本。
 2. 遇到与三方库的 OpenSSL 冲突，例如百度地图（BaiduMapKit）依赖了低版本的 OpenSSL 静态库，会产生依赖冲突。
-3. 如果遇到 OpenSSL 冲突的情况，参考[冲突解决办法](./error-openssl)，编译 GMObjC 为动态库即可解决。
+3. 如果遇到 OpenSSL 冲突的情况，参考[冲突解决办法](./error-openssl)，使用动态库可解决此类问题。
 :::
 
 ### Carthage {#install-carthage}

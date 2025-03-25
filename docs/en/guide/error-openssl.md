@@ -8,8 +8,9 @@ Use Carthage to compile GMObjC into a dynamic library **GMObjC.xcframework**. At
 
 1. **Solution 1**: According to the instructions in [Getting Started](./getting-started#install-carthage), compile GMObjC.xcframework and drag it to the project for integration.
 
-2. **Solution 2**: Download the compiled [GMObjC.xcframework.zip
-](https://github.com/muzipiao/GMObjC/releases) directly, unzip it and drag it to the project for integration.
+2. **Solution 2**: Download the compiled [GMObjC.xcframework.zip](https://github.com/muzipiao/GMObjC/releases) directly, unzip it and drag it to the project for integration.
+
+3. **Solution 3**：If the project uses CocoaPods for integration, use `pod 'GMDynamic'` to install the dynamic library version of GMObjC.
 
 ::: warning Note
 GMObjC.xcframework is a dynamic library, you need to select the `Embed & Sign` mode, and you do not need to import the OpenSSL.xcframework library separately.
